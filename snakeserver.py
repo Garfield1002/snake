@@ -10,13 +10,14 @@ import random
 
 
 class SnakeServer():
-    def __init__(self, max_players):
+    def __init__(self, max_players, ip):
         self.max_players = 2  # max_players
         self.height = 21  # TEMPORARY
         self.width = 50  # TEMPORARY
         self.snakes = []
         self.socket = socket.socket()
         self.board = None
+        self.ip = ip
         # open the config.json file
         with open('config.json') as f:
             self.cfg = json.load(f)
@@ -25,7 +26,7 @@ class SnakeServer():
     # awaits players
     def _lobby(self):
         print('Awaiting players')
-        self.socket.bind((socket.gethostname(), self.cfg.get("port")))
+        self.socket.bind((self.ip, self.cfg.get("port")))
         self.socket.listen(self.cfg.get("backlog"))
         self._display(['Awaiting Players'])
 

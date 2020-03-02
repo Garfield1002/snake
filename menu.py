@@ -1,5 +1,6 @@
 import curses
 import snakeclient
+import snakeserver
 import json
 
 width = 50
@@ -86,7 +87,7 @@ def menu(win, L):
         win.refresh()
 
     update_screen()
-
+    global cfg
     while True:
         pressed = win.getch()
 
@@ -96,9 +97,9 @@ def menu(win, L):
 
         win.addstr(1, 1, str(pressed))
 
-        if pressed == 65:  # curses.KEY_DOWN:
+        if pressed == 65 or pressed == cfg["keys"]["down"]:  # curses.KEY_DOWN:
             selected -= 1
-        elif pressed == 66:  # curses.KEY_UP:
+        elif pressed == 66 or pressed == cfg["keys"]["up"]:  # curses.KEY_UP:
             selected += 1
         # elif pressed == 27:  # curses.KEY_ESC
         #     return lambda *args: print('See ya soon')
@@ -225,9 +226,10 @@ def __host():
         pass
 
     return curses.wrapper(warning,
-                          ['Press Enter to connect to',
+                          ['Press Enter to host on',
                            str(ip)],
-                          lambda ip: snakeclient.SnakeClient(ip).safe_main(),
+                          # UNIMPLEMENTED ----------------
+                          lambda ip: snakeserver.SnakeServer(2, ip).start(),
                           ip)
     pass
 
