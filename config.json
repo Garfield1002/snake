@@ -1,0 +1,1 @@
+{"sound": 1, "port": 12345, "keys": {"left": 97, "right": 100, "down": 115, "up": 98}, "backlog": 10, "escape": 27, "server_tick": 150, "inputs": {"115": [0, 1], "97": [-2, 0], "100": [2, 0], "98": [0, -1]}, "client_tick": 15}
