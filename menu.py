@@ -7,6 +7,20 @@ width = 50
 height = 21
 
 
+# function to read keys
+def read_key(win):
+    ch = win.getch()
+    if ch == (27 and 91 and 65):
+        return "UP"
+    elif ch == (27 and 91 and 66):
+        return "DOWN"
+    elif ch == (27 and 91 and 67):
+        return "RIGHT"
+    elif ch == (27 and 91 and 68):
+        return "LEFT"
+    return ch
+
+
 def __main(scr, L):
     # creates a window
     win = curses.newwin(height, width, 1, 1)
@@ -24,32 +38,35 @@ def __main(scr, L):
     return menu(win, L)
 
 
-def warning(scr, messages, fun, *args):
-    win = curses.newwin(height, width, 1, 1)
-    win.border(ord('#'),
-               ord('#'),
-               ord('#'),
-               ord('#'),
-               ord('#'),
-               ord('#'),
-               ord('#'),
-               ord('#'))
-    curses.curs_set(False)
+def warning(messages, fun, *args):
+    def aux(scr, messages, fun):
+        win = curses.newwin(height, width, 1, 1)
+        win.border(ord('#'),
+                   ord('#'),
+                   ord('#'),
+                   ord('#'),
+                   ord('#'),
+                   ord('#'),
+                   ord('#'),
+                   ord('#'))
+        curses.curs_set(False)
 
-    win.addstr(1,
-               1,
-               'Press "Esc" to return to main menu')
-    for i, message in enumerate(messages):
-        win.addstr((height - len(messages)) // 2 + i,
-                   (width - len(message)) // 2,
-                   message)
+        win.addstr(1,
+                   1,
+                   'Press "Esc" to return to main menu')
+        for i, message in enumerate(messages):
+            win.addstr((height - len(messages)) // 2 + i,
+                       (width - len(message)) // 2,
+                       message)
 
-    while True:
-        pressed = win.getch()
-        if pressed == 10:  # curses.KEY_ENTER:
-            fun(*args)
-        elif pressed == 27:
-            return main_menu()
+        while True:
+            pressed = win.getch()
+            if pressed == 10:  # curses.KEY_ENTER:
+                return fun
+            elif pressed == 27:
+                return main_menu
+    foo = curses.wrapper(aux, messages, fun)
+    foo(*args)
 
 
 def menu(win, L):
@@ -89,7 +106,7 @@ def menu(win, L):
     update_screen()
     global cfg
     while True:
-        pressed = win.getch()
+        pressed = read_key(win)
 
         if pressed == 10:  # curses.KEY_ENTER:
             a, fun = L[selected]
@@ -97,12 +114,12 @@ def menu(win, L):
 
         win.addstr(1, 1, str(pressed))
 
-        if pressed == 65 or pressed == cfg["keys"]["down"]:  # curses.KEY_DOWN:
+        if pressed == "UP" or pressed == cfg["keys"]["up"]:
             selected -= 1
-        elif pressed == 66 or pressed == cfg["keys"]["up"]:  # curses.KEY_UP:
+        elif pressed == "DOWN" or pressed == cfg["keys"]["down"]:
             selected += 1
-        # elif pressed == 27:  # curses.KEY_ESC
-        #     return lambda *args: print('See ya soon')
+#        elif pressed == 27:  # curses.KEY_ESC
+#            return lambda *args: print('See ya soon')
 
         selected = selected % len(L)
         update_screen()
@@ -139,11 +156,9 @@ def __join():
     if ip == 'local':
         pass
 
-    return curses.wrapper(warning,
-                          ['Press Enter to connect to',
-                           str(ip)],
-                          lambda ip: snakeclient.SnakeClient(ip).safe_main(),
-                          ip)
+    return warning(['Press Enter to connect to', str(ip)],
+                   lambda ip: snakeclient.SnakeClient(ip).safe_main(),
+                   ip)
 
 
 def user_input(message, tp=None):
@@ -225,13 +240,10 @@ def __host():
     if ip == 'local':
         pass
 
-    return curses.wrapper(warning,
-                          ['Press Enter to host on',
-                           str(ip)],
-                          # UNIMPLEMENTED ----------------
-                          lambda ip: snakeserver.SnakeServer(2, ip).start(),
-                          ip)
-    pass
+    return warning(['Press Enter to host on', str(ip)],
+                   # UNIMPLEMENTED ----------------
+                   lambda ip: snakeserver.SnakeServer(2, ip).start(),
+                   ip)
 
 
 def __settings():
@@ -243,7 +255,7 @@ def __settings():
                        ('Left Key: {0}'.format(chr(cfg["keys"]['left'])),
                         lambda *args: __change_key([-2, 0], "left")),
                        ('Right Key: {0}'.format(chr(cfg["keys"]['right'])),
-                        lambda *args: __change_key([0, 2], "right")),
+                        lambda *args: __change_key([2, 0], "right")),
                        ('Sound: {0}'.format(bool(cfg["sound"])),
                         lambda *args: __change_bool("sound")),
                        ('Main Menu', main_menu)]

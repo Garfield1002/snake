@@ -105,6 +105,8 @@ class SnakeServer():
                             self.board[x][y] = ' '
                         else:
                             snake_instance.grow = False
+        # the game is now over
+        self.socket.close()
 
     # adds a fruit to an available spot
     def _add_fruit(self):

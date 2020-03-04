@@ -14,6 +14,7 @@ class SnakeClient():
         self.width = None
         self.board = None
         self.alive = True
+        self.win = None
         self.score = 0
         self.direction = (2, 0)
         self.host = ip  # '192.168.43.58'
@@ -23,6 +24,26 @@ class SnakeClient():
         self.port = self.cfg.get("port")
         self.tick = self.cfg.get("client_tick")
         self.inputs = self.cfg.get("inputs")
+        self.default = {
+            "UP": [0, 1],
+            "DOWN": [0, -1],
+            "LEFT": [-2, 0],
+            "RIGHT": [2, 0]
+            }
+        self.beep = self.cfg.get("sound")
+
+    # function to read keys
+    def read_key(self):
+        ch = self.win.getch()
+        if ch == (27 and 91 and 65):
+            return "UP"
+        elif ch == (27 and 91 and 66):
+            return "DOWN"
+        elif ch == (27 and 91 and 67):
+            return "RIGHT"
+        elif ch == (27 and 91 and 68):
+            return "LEFT"
+        return ch
 
     def __main(self, scr):
         # turns off the cursor
@@ -53,7 +74,7 @@ class SnakeClient():
 
             # gets the command of the user, waiting a maximum
             # of client_tick time
-            pressed = self.win.getch()
+            pressed = self.read_key()
 
             # gets the remaining amount of time that needs to be waited
             remaining_wait = self.tick * 10 ** (-3) \
@@ -70,22 +91,27 @@ class SnakeClient():
                              self.direction)) != (0, 0):
                     self.direction = tuple(self.inputs[str(pressed)])
 
+            # are the arrow keys being used
+            elif pressed in self.default.keys():
+                if tuple(x + y for x, y in
+                         zip(tuple(self.default[pressed]),
+                             self.direction)) != (0, 0):
+                    self.direction = tuple(self.default[pressed])
+
             # checks if the user pressed the escape key
-            if pressed == self.cfg.get("escape"):  # the esc key
+            elif pressed == self.cfg.get("escape"):  # the esc key
                 raise Exception('user abort')
 
             # gets the board
-            # beep, self.alive, self.score, self.board =  \
-            #    self.__send_direction()
-            self.alive, self.score, self.board =  \
+            beep, self.alive, self.score, self.board =  \
                 self.__send_direction()
 
             # if the player is dead quits the game
             if not self.alive:
                 break
 
-            # if beep and config.beep:
-            #     curses.beep()
+            if beep and self.beep:
+                curses.beep()
 
             # updates the screen
             for x in range(1, self.width - 1):
