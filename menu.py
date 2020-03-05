@@ -157,7 +157,7 @@ def menu(win, L):
 
 
 def __join():
-    ip = curses.wrapper(user_input,
+    ip = curses.wrapper(get_input,
                         'Enter the IP address you want to connect to.',
                         '("local" for local game)',
                         'IP: ',
@@ -222,19 +222,19 @@ def __change_bool(name):
 
 
 def __host():
-    ip = curses.wrapper(user_input,
+    ip = curses.wrapper(get_input,
                         'Enter the IP address you want to host on.',
                         '("local" for local game)',
                         'IP: ',
                         9
                         ).decode('utf-8')
 
-    players = curses.wrapper(user_input,
-                             '',
-                             'Enter the amount of players.',
-                             'Max players: ',
-                             9
-                             ).decode('utf-8')
+    players = int(curses.wrapper(get_input,
+                                 '',
+                                 'Enter the amount of players.',
+                                 'Max players: ',
+                                 9
+                                 ).decode('utf-8'))
 
     global default_ip
     if ip == 'local' or ip == '':

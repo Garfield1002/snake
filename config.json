@@ -1,1 +1,1 @@
-{"client_tick": 15, "keys": {"down": 115, "up": 119, "left": 97, "right": 100}, "sound": 1, "escape": 27, "server_tick": 150, "port": 12345, "inputs": {"97": [-2, 0], "115": [0, 1], "119": [0, -1], "100": [2, 0]}, "backlog": 10}
+{"client_tick": 15, "keys": {"down": 115, "up": 119, "left": 97, "right": 100}, "sound": 1, "escape": 27, "server_tick": 100, "port": 12345, "inputs": {"97": [-2, 0], "115": [0, 1], "119": [0, -1], "100": [2, 0]}, "backlog": 10}
