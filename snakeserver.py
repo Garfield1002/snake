@@ -11,7 +11,7 @@ import random
 
 class SnakeServer():
     def __init__(self, max_players, ip):
-        self.max_players = 2  # max_players
+        self.max_players = max_players
         self.height = 21  # TEMPORARY
         self.width = 50  # TEMPORARY
         self.snakes = []

@@ -2,6 +2,7 @@ import curses
 import snakeclient
 import snakeserver
 import json
+import socket
 
 width = 50
 height = 21
@@ -19,6 +20,32 @@ def read_key(win):
     elif ch == (27 and 91 and 68):
         return "LEFT"
     return ch
+
+
+def get_input(scr, l1, l2, prompt, expected):
+    curses.curs_set(True)
+
+    win = curses.newwin(height, width, 1, 1)
+    win.border(ord('#'),
+               ord('#'),
+               ord('#'),
+               ord('#'),
+               ord('#'),
+               ord('#'),
+               ord('#'),
+               ord('#'))
+    win.addstr(height // 2 - 1,
+               (width - len(l1)) // 2,
+               l1)
+    win.addstr(height // 2,
+               (width - len(l2)) // 2,
+               l2)
+    curses.echo(True)
+    win.addstr(height // 2 + 1,
+               (width - len(prompt) - expected) // 2,
+               prompt)
+
+    return win.getstr()
 
 
 def __main(scr, L):
@@ -70,6 +97,8 @@ def warning(messages, fun, *args):
 
 
 def menu(win, L):
+    global default_ip
+    default_ip = socket.gethostbyname(socket.gethostname())
     curses.curs_set(False)
 
     # default attributes
@@ -91,6 +120,8 @@ def menu(win, L):
     horizontal_padding = max(len(name) for name, _ in L) + 2
 
     selected = 0
+
+    win.addstr(height, 1, "IP: {0}".format(default_ip))
 
     def update_screen():
         for i, (name, _) in enumerate(L):
@@ -126,35 +157,16 @@ def menu(win, L):
 
 
 def __join():
-    def aux(scr):
-        curses.curs_set(True)
+    ip = curses.wrapper(user_input,
+                        'Enter the IP address you want to connect to.',
+                        '("local" for local game)',
+                        'IP: ',
+                        9
+                        ).decode('utf-8')
 
-        win = curses.newwin(height, width, 1, 1)
-        win.border(ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'))
-        win.addstr(height // 2 - 1,
-                   (width - 44) // 2,
-                   'Enter the IP address you want to connect to.')
-        win.addstr(height // 2,
-                   (width - 44) // 2,
-                   '("local" for local game)')
-        curses.echo(True)
-        win.addstr(height // 2 + 1,
-                   (width - 16) // 2,
-                   'IP: ')
-
-        return win.getstr()
-
-    ip = curses.wrapper(aux).decode('utf-8')
-
-    if ip == 'local':
-        pass
+    global default_ip
+    if ip == 'local' or ip == '':
+        ip = default_ip
 
     return warning(['Press Enter to connect to', str(ip)],
                    lambda ip: snakeclient.SnakeClient(ip).safe_main(),
@@ -210,39 +222,27 @@ def __change_bool(name):
 
 
 def __host():
-    def aux(scr):
-        curses.curs_set(True)
+    ip = curses.wrapper(user_input,
+                        'Enter the IP address you want to host on.',
+                        '("local" for local game)',
+                        'IP: ',
+                        9
+                        ).decode('utf-8')
 
-        win = curses.newwin(height, width, 1, 1)
-        win.border(ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'),
-                   ord('#'))
-        win.addstr(height // 2 - 1,
-                   (width - 44) // 2,
-                   'Enter the IP address you want to host on.')
-        win.addstr(height // 2,
-                   (width - 44) // 2,
-                   '("local" for local game)')
-        curses.echo(True)
-        win.addstr(height // 2 + 1,
-                   (width - 16) // 2,
-                   'IP: ')
+    players = curses.wrapper(user_input,
+                             '',
+                             'Enter the amount of players.',
+                             'Max players: ',
+                             9
+                             ).decode('utf-8')
 
-        return win.getstr()
-
-    ip = curses.wrapper(aux).decode('utf-8')
-
-    if ip == 'local':
-        pass
+    global default_ip
+    if ip == 'local' or ip == '':
+        ip = default_ip
 
     return warning(['Press Enter to host on', str(ip)],
                    # UNIMPLEMENTED ----------------
-                   lambda ip: snakeserver.SnakeServer(2, ip).start(),
+                   lambda ip: snakeserver.SnakeServer(players, ip).start(),
                    ip)
 
 
