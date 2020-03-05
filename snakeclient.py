@@ -31,6 +31,17 @@ class SnakeClient():
             "RIGHT": [2, 0]
             }
         self.beep = self.cfg.get("sound")
+        self. art = \
+            [
+                ' .d8888b.                    888',
+                'd88P  Y88b                   888',
+                'Y88b.                        888',
+                ' "Y888b.   88888b.   8888b.  888  888  .d88b.',
+                '    "Y88b. 888 "88b     "88b 888 .88P d8P  Y8b',
+                '      "888 888  888 .d888888 888888K  88888888',
+                'Y88b  d88P 888  888 888  888 888 "88b Y8b.',
+                ' "Y8888P"  888  888 "Y888888 888  888  "Y8888'
+            ]
 
     # function to read keys
     def read_key(self):
@@ -64,6 +75,8 @@ class SnakeClient():
                         ord('#'),
                         ord('#'),
                         ord('#'))
+        for i, l in enumerate(self.art):
+            self.win.addstr(2+i, 2, l)
 
         while True:
             # gets user input
